@@ -37,11 +37,16 @@ def reverse(strand):
 # 1. Only contain A,T,C,G (meaning not empty too)
 # 2. Is all uppercase (done within the function)
 # 3. Contains no newlines (done within the function)
-# if it is valid it will return the validated string else will return false
+# if it is valid it will return the validated string else will display the bad strand and stop the execution of the program
 def validate(strand):  
     strand = strand.replace("\n", "")
     strand = strand.upper()
     if re.search(r'[^ATCG]', strand) == None and len(strand) != 0:
+        print("Valid Strand")
         return strand
     else:
-        return False
+        print("Invalid Strand Given:")
+        print(strand)
+        print()
+        print("Stopping Execution")
+        exit()

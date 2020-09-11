@@ -31,31 +31,25 @@ print()
 nsp6 = genome[10972:11841]
 
 print("Validating nsp6 gene")
+
 # validate nsp6
 nsp6 = smanip.validate(nsp6)
 
-# if nsp6 is valid program can continue
-if nsp6 != False:
-    print("nsp6 is valid")
-    print()
+# display the genes length and base pairs
+print("nsp6 length: " + str(len(nsp6)))
+print("nsp6:")
+print(nsp6)
+print()
 
-    # display the genes length and base pairs
-    print("nsp6 length: " + str(len(nsp6)))
-    print("nsp6:")
-    print(nsp6)
-    print()
+print("Finding complement strand")
 
-    print("Finding complement strand")
+# retrieve complement strand to nsp6
+# 3->5
+c_nsp6 = smanip.getcomplement(nsp6)
 
-    # retrieve complement strand to nsp6
-    # 3->5
-    c_nsp6 = smanip.getcomplement(nsp6)
+# 5->3
+c_nsp6 = smanip.reverse(c_nsp6)
 
-    # 5->3
-    c_nsp6 = smanip.reverse(c_nsp6)
-
-    # combine both strands together
-    # note: normally c_nsp6 would be going the opposite direction of nsp6 (EX: 5->3, 3->5) but for simplicity both strands go 5->3
-    RNA = (nsp6, c_nsp6)
-else:
-    print("Invalid Gene Sequence")
+# combine both strands together
+# note: normally c_nsp6 would be going the opposite direction of nsp6 (EX: 5->3, 3->5) but for simplicity both strands go 5->3
+RNA = (nsp6, c_nsp6)
