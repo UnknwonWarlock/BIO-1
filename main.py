@@ -5,6 +5,7 @@
 
 import os
 import strandmanipulation as smanip
+import primers
 
 # filename for the Covid-19 Genome
 filename = "Files/SARS_COV2.fasta"
