@@ -54,4 +54,4 @@ c_nsp6 = smanip.reverse(c_nsp6)
 # combine both strands together (coding strand, template strand)
 # note: normally c_nsp6 would be going the opposite direction of nsp6 (EX: 5->3, 3->5) but for simplicity both strands go 5->3
 cDNA = (nsp6, c_nsp6)
-primers.get_primers(cDNA, 250)
+primers.get_primers(cDNA, 215, 22)

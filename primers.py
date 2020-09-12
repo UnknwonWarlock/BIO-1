@@ -36,27 +36,27 @@ def get_distance(length, r_primer, f_primer):
     distance = distance + 2
     return distance
 
-# Param: string for the desired strand, inclusive start position
+# Param: string for the desired strand, desired primer size, and inclusive start position
 # gets a potential primer in the strand (tests for gc count and primer being unique in strand)
 # the size of the primer retrieved by this function will be 20
 # Return: a tuple of, the primer, its inclusive start position in the strand, and the exclusive end position
-def get_potential_primer(strand, start):
+def get_potential_primer(strand, primer_size, start):
     # get the length of strand
     length = len(strand)
     
     # loop through strand until a potential primer is found
     while start < length:
-        test = strand[start:start + 20]
-        if check_unique(test, strand) and get_gc_count(test) > 0.4 and len(test) == 20:
-            return (test, start, start+20)
+        test = strand[start:start + primer_size]
+        if check_unique(test, strand) and (get_gc_count(test) > 0.4 and get_gc_count(test) < 0.6) and len(test) == primer_size:
+            return (test, start, start+primer_size)
         else:
             start = start + 1
 
-# Param: a tuple of two complementary strands for cDNA and a limiter for the stopping condition
+# Param: a tuple of two complementary strands for cDNA, a limiter for the stopping condition, and the desired primer_size
 # Gets a forward and reverse primers within inner range for the limiter
 # Note: limiter is the inclusive outer range
 # Return: tuple of the forward primer and revese primer tuples (See get_distance for details on primer tuples)
-def get_primers(cDNA, limiter):
+def get_primers(cDNA, limiter, primer_size):
     # get length from any of the single strands
     length = len(cDNA[0])
 
@@ -65,14 +65,14 @@ def get_primers(cDNA, limiter):
     t_strand = cDNA[1]
 
     # get initial potential primers and distance
-    f_primer = get_potential_primer(c_strand, 0)
-    r_primer = get_potential_primer(t_strand, 0)
+    f_primer = get_potential_primer(c_strand, primer_size, 0)
+    r_primer = get_potential_primer(t_strand, primer_size, 0)
     distance = get_distance(length, r_primer, f_primer)
 
     # if not in the desired primers find new ones until they satisfy the limiter
     while distance > limiter:
-        f_primer = get_potential_primer(c_strand, f_primer[1] + 1)
-        r_primer = get_potential_primer(t_strand, r_primer[1] + 1)
+        f_primer = get_potential_primer(c_strand, primer_size, f_primer[1] + 1)
+        r_primer = get_potential_primer(t_strand, primer_size, r_primer[1] + 1)
         distance = get_distance(length, r_primer, f_primer)
     print("Returning Primers Have a Distance of: " + str(distance))
     return (f_primer, r_primer)
