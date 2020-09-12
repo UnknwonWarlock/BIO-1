@@ -2,10 +2,12 @@
 import os
 import re
 
-# provides a single strand of DNA and provides the complement
-# requires a valid strand be passed
-# this function does not reverse the order
+# Param: a string for the desired strand
+# Gets the complement of the given strand.
+# Requires strand to be validated first
+# Function does no reverse for the direction
 # EX: if you give a 5->3 strand you will get the 3->5 complement and vice versa
+# Return: the complement to the provided strand 
 def getcomplement(strand):
 
 
@@ -28,16 +30,19 @@ def getcomplement(strand):
 
     return cStrand
 
-# reverse a provided strand
-# if given 3->5 will return 5->3 and vice versa
+# Param: a string for the desired strand
+# Reverses the direction of a given strand
+# EX: If given 3->5 will return 5->3 and vice versa
+# Return: Reverse string for the strand
 def reverse(strand):
     return strand[::-1]
 
+# Param: A string for the desired strand
 # validates a provided strand to make sure it follows the following format:
 # 1. Only contain A,T,C,G (meaning not empty too)
 # 2. Is all uppercase (done within the function)
 # 3. Contains no newlines (done within the function)
-# if it is valid it will return the validated string else will display the bad strand and stop the execution of the program
+# Return: either the validated strand or stops the programs execution
 def validate(strand):  
     strand = strand.replace("\n", "")
     strand = strand.upper()
