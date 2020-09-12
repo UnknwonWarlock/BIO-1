@@ -36,9 +36,8 @@ def get_distance(length, r_primer, f_primer):
     distance = distance + 2
     return distance
 
-# Param: string for the desired strand, desired primer size, and inclusive start position
-# gets a potential primer in the strand (tests for gc count and primer being unique in strand)
-# the size of the primer retrieved by this function will be 20
+# Param: string for the desired strand, desired primer size (usually 18-24), and inclusive start position
+# gets a potential primer in the strand (tests for gc count (0.4 < GC < 0.6) and primer being unique in strand)
 # Return: a tuple of, the primer, its inclusive start position in the strand, and the exclusive end position
 def get_potential_primer(strand, primer_size, start):
     # get the length of strand
@@ -52,9 +51,9 @@ def get_potential_primer(strand, primer_size, start):
         else:
             start = start + 1
 
-# Param: a tuple of two complementary strands for cDNA, a limiter for the stopping condition, and the desired primer_size
+# Param: a tuple of two complementary strands for cDNA, a limiter for the stopping condition, and the desired primer_size 
 # Gets a forward and reverse primers within inner range for the limiter
-# Note: limiter is the inclusive outer range
+# Note: limiter is the inclusive outer range and primer_size is usually between 18-24 in size
 # Return: tuple of the forward primer and revese primer tuples (See get_distance for details on primer tuples)
 def get_primers(cDNA, limiter, primer_size):
     # get length from any of the single strands
