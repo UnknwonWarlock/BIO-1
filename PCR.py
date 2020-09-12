@@ -1,4 +1,5 @@
 # Contains functions to simulate PCR
+import primers
 
 # Param: a list of 2 string tuples to represent double stranded DNA
 # the double stranded list will be made into a list of single strands
@@ -16,3 +17,14 @@ def denaturation(dna_list):
 # Return: a list of two string tuples to represent double stranded DNA
 def annealing_elongation(single_strands, primers, fall_of_rate):
     print()
+
+def PCR(DNA, fall_of_rate, num_cycles, limiter=215, primer_size=22):
+    primers = primers.get_primers(DNA,limiter,primer_size)
+    cycles = 0
+    PCRproducts = [DNA]
+    while cycles < num_cycles:
+        single_strands = denaturation(PCRproducts)
+        PCRproducts = annealing_elongation(single_strands, primers, fall_of_rate)
+        cycles += 1
+
+    return PCRproducts
