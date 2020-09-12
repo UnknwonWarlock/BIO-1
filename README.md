@@ -1,7 +1,7 @@
 # BIO-1
 
-University of Akron
-Dr. Duan
+University of Akron  
+Dr. Duan  
 Introduction to Bioinformatics: Project 1 PCR Simulation  
   
 Project is meant to simulate PCR on the Covid-19 genome to an assigned gene. The assigned gene for the groups is: nsp6
