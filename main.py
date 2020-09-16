@@ -5,6 +5,7 @@
 
 import os
 import strandmanipulation as smanip
+import PCR as pcr
 import primers
 
 # filename for the Covid-19 Genome
@@ -38,20 +39,39 @@ nsp6 = smanip.validate(nsp6)
 
 # display the genes length and base pairs
 print("nsp6 length: " + str(len(nsp6)))
-print("nsp6:")
+print("nsp6(5->3):")
 print(nsp6)
 print()
 
-print("Finding complement strand")
+print("Finding complement strand for nsp6")
 
 # retrieve complement strand to nsp6
 # 3->5
 c_nsp6 = smanip.getcomplement(nsp6)
 
-# 5->3
-c_nsp6 = smanip.reverse(c_nsp6)
+# 5->3 to 3->5
+nsp6 = smanip.reverse(nsp6)
 
 # combine both strands together (coding strand, template strand)
-# note: normally c_nsp6 would be going the opposite direction of nsp6 (EX: 5->3, 3->5) but for simplicity both strands go 5->3
+# note: normally c_nsp6 would be going the opposite direction of nsp6 (EX: 5->3, 3->5) but for simplicity both strands go 3->5
+print("Binding both nsp6 strands together")
 cDNA = (nsp6, c_nsp6)
-primers.get_primers(cDNA, 215, 22)
+
+print("nsp6(3->5):")
+print(nsp6)
+print()
+print("c_nsp6(3->5):")
+print(c_nsp6)
+print()
+
+primes = primers.get_primers(cDNA, limiter=215, messages=False)
+single_strands = pcr.denaturation([cDNA])
+print("single_strands:")
+print(single_strands)
+pcr.annealing_elongation(single_strands, primes, 50, 205)
+
+# forward:           ACCACTGGTTGTTACTCACA
+# reverse:           ACGGACGATCAACCCACTAC
+# primer_f_start:    31
+# primer_r_start:    256
+# distance:          205

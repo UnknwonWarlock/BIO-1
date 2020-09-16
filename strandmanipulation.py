@@ -12,8 +12,9 @@ def getcomplement(strand):
 
 
     # prints provided strand
-    print("Given Strand:")
-    print(strand)
+    # Debugging Code
+    #print("Given Strand:")
+    #print(strand)
 
     # the needed replacements to get complement strand
     cStrand = strand.replace("A", "i")
@@ -24,9 +25,10 @@ def getcomplement(strand):
     cStrand = cStrand.replace("i", "T")
     
     # print and return the found complement strand
-    print()
-    print("Complement strand:")
-    print(cStrand)
+    # Debugging Code
+    #print()
+    #print("Complement strand:")
+    #print(cStrand)
 
     return cStrand
 

@@ -38,15 +38,14 @@ Contains functions for some functions to help find and tune the desired aspect o
 - get_gc_count(primer)
   - given a potential primer it will return the GC count. In this project we want a GC count between 0.40 and 0.60
 
-- get_distance(length, r_primer, f_primer)
-  - given the length of the full strand, an reverse primer tuple, and a forward primer tuple and returns the distance between the two
-  - the primer tuples are formatted as (string, int, int)
-    - the string is the primer
-    - the first int is the inclusive start point
-    - the second int is the exclusive end point
+- get_distance(strand, strand_r_primer, strand_f_primer)
+  - given a single strand and the two primer REPRESENTATION on that strand the distance will be calculated
 
 - get_potential_primer(strand, primer_size, start)
   - given the full strand, the desired primer size (typically between 18-24), and the inclusive start point to search from it will return a primer tuple or none.
   - Whether this is the reverse or forward primer depends on the strand given and is up to the user to determine
   - keeping track of the direction is also up to the user of the function
-  - Notes: to use the get_distance function the primer tuples provided assume the the int start and int end of from the two primers are from the same direction in this function (both strands where inserted into the function going the same direction, either both 5->3 or 3->5)
+
+#### Primer Function Notes
+
+- Very buggy and was just an attempt. Do not suggest actually using extensively.

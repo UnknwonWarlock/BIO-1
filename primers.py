@@ -1,10 +1,10 @@
 # Inlcudes anything used to get the primers
 import os
-import strandmanipulation
+import strandmanipulation as smanip
 
-# Param: a string for the desired primer and strand
-# checks if the primer is unique in the provided strand
-# Return: true if primer is unique otherwise false
+# param: a string for the desired primer and strand
+# return: true if primer is unique otherwise false
+# sum: checks if the primer is unique in the provided strand
 def check_unique(primer, strand):
     result = strand.count(primer)
     if result == 1:
@@ -12,66 +12,128 @@ def check_unique(primer, strand):
     else:
         return False
 
-# Param: string for desired primer
-# gets the gc count for the given primer
-# Return: the gc count for the primer
+# param: string for desired primer
+# return: the gc count for the primer
+# sum: gets the gc count for the given primer
 def get_gc_count(primer):
     return (primer.count("G") + primer.count("C")) / len(primer)
 
-# Param: an int for the length of a single strand, a tuple primer object for forward primer, a tuple primer object for reverse primer
-# Both tuples for primers should be of (string, int int):
-#       1. string: a string for the primer
-#       2. int: first int is the inclusive start position for the primer in the strand
-#       3. int: second int is the exclusive end position for the primer in the strand
-# Calculates the distance between the primers
-# Return: the distance between the primers
-def get_distance(length, r_primer, f_primer):
-    # remove parts not in the range
-    distance = (length - f_primer[1]) - r_primer[1]
-    
-    # remove the size of the primers
-    distance = (distance - len(f_primer[0]) - len(r_primer[0]))
-    
-    # add two for the two inclusive starts
-    distance = distance + 2
-    return distance
 
-# Param: string for the desired strand, desired primer size (usually 18-24), and inclusive start position
-# gets a potential primer in the strand (tests for gc count (0.4 < GC < 0.6) and primer being unique in strand)
-# Return: a tuple of, the primer, its inclusive start position in the strand, and the exclusive end position
-def get_potential_primer(strand, primer_size, start):
-    # get the length of strand
-    length = len(strand)
+# param: starting position in the strand for the first primer, starting position in the strand for the second primer, primers' size
+# return: the distance between the two primer's on the strand
+# sum: Takes the length of the DNA strand subtract second position's primer to the first primer's position + the primer_size
+# notes: make sure that primer_start_2 is farther primer in the strand
+def get_distance(primer_start_1, primer_start_2, primer_size):
+    return primer_start_2 - (primer_start_1 + primer_size)
+
     
-    # loop through strand until a potential primer is found
-    while start < length:
-        test = strand[start:start + primer_size]
-        if check_unique(test, strand) and (get_gc_count(test) > 0.4 and get_gc_count(test) < 0.6) and len(test) == primer_size:
-            return (test, start, start+primer_size)
+# param: 
+#   the strand that the primer should be found, the primer size to find, the primer size desired, the start, reverse the strand, and
+#   complement flag to return the complement
+#
+# return: the primer found as a string or none
+# sum: takes a strand and finds a potential primer to use
+#
+# notes: 
+#   - if reverse is true reverses the given strand before working, if the complement is true the the returned result will be the
+#     the complement of the actual result, false is default for both
+#
+#   - checks the gc count is >= 0.4 and <= 0.6, also checks the length, and that it is unique
+def get_potential_primer(strand, primer_size=20, start=0, reverse=False, complement=False):
+    working_strand = strand
+
+    # reverse working strand if flag set
+    if reverse:
+        working_strand = smanip.reverse(strand)
+    
+    while start < len(strand):
+        # get potential primer
+        p_primer = working_strand[start: start + primer_size]
+
+        # get current potential primer gc
+        gc = get_gc_count(p_primer)
+
+        # do some checks and return if valid, otherwise continue looping through strand
+        if check_unique(p_primer, working_strand) and (gc >= 0.40 and gc <= 0.60) and len(p_primer) == primer_size:
+            if complement:
+                p_primer = smanip.getcomplement(p_primer)
+            return p_primer
         else:
-            start = start + 1
+            start += 1
 
-# Param: a tuple of two complementary strands for cDNA, a limiter for the stopping condition, and the desired primer_size 
-# Gets a forward and reverse primers within inner range for the limiter
-# Note: limiter is the inclusive outer range and primer_size is usually between 18-24 in size
-# Return: tuple of the forward primer and revese primer tuples (See get_distance for details on primer tuples)
-def get_primers(cDNA, limiter, primer_size):
-    # get length from any of the single strands
-    length = len(cDNA[0])
 
-    # separate the two strands
-    c_strand = cDNA[0]
-    t_strand = cDNA[1]
+# param: 
+#   DNA a tuple of two complementry strands, primer size, limiter to try and restrict distance for primers, reverse flag, 
+#   complement flag, messages flag
+#
+# return: two primers found (forward 5->3, reverse 3->5) 
+# sum: tries to find primers for the specified options and returns them 
+# notes: 
+#   - reverse and complement flags 0-3, 0 for none, 1 for forward primer, 2 for reverse primer, and 3 for both.
+#     these help choose how the return output should be returned (all default is 0)
+#
+#   - messages flag turns on helpful messages for many of the potential primers found through the process
+#     their distance and positions
+#
+#   - DNA is assumed to be (coding strand, template strand) and both going in the 3->5 direction
+def get_primers(DNA, primer_size=20, limiter=200, reverse=0, complement=0, messages=True):
 
-    # get initial potential primers and distance
-    f_primer = get_potential_primer(c_strand, primer_size, 0)
-    r_primer = get_potential_primer(t_strand, primer_size, 0)
-    distance = get_distance(length, r_primer, f_primer)
+    # separate strand
+    c_strand = DNA[0]
+    t_strand = DNA[1]
 
-    # if not in the desired primers find new ones until they satisfy the limiter
+    # get first primers
+    f_primer = get_potential_primer(t_strand, primer_size, 0, False, True)
+    r_primer = get_potential_primer(c_strand, primer_size, 0, False, True)
+    r_primer = smanip.reverse(r_primer)
+
+    # get primers' positions for distance
+    primer_f_start = smanip.reverse(c_strand).index(f_primer)
+    primer_r_start = t_strand.index(r_primer)
+
+    # get distance
+    distance = get_distance(primer_f_start, primer_r_start, primer_size)
+
+    if messages:
+        print("forward: " + f_primer)
+        print("reverse: " + r_primer)
+        print("primer_f_start: " + str(primer_f_start))
+        print("primer_r_start: " + str(primer_r_start))
+        print("distance: " + str(distance))
+        print()
+
+    # repeat above process until distance is less than limiter
     while distance > limiter:
-        f_primer = get_potential_primer(c_strand, primer_size, f_primer[1] + 1)
-        r_primer = get_potential_primer(t_strand, primer_size, r_primer[1] + 1)
-        distance = get_distance(length, r_primer, f_primer)
-    print("Returning Primers Have a Distance of: " + str(distance))
+        f_primer = get_potential_primer(t_strand, primer_size, primer_f_start + 1, False, True)
+        r_primer = get_potential_primer(c_strand, primer_size, len(c_strand) - primer_r_start, False, True)
+        r_primer = smanip.reverse(r_primer)
+
+        primer_f_start = smanip.reverse(c_strand).index(f_primer)
+        primer_r_start = t_strand.index(r_primer)
+
+        distance = get_distance(primer_f_start, primer_r_start, primer_size)
+
+        if messages:
+            print("forward: " + f_primer)
+            print("reverse: " + r_primer)
+            print("primer_f_start: " + str(primer_f_start))
+            print("primer_r_start: " + str(primer_r_start))
+            print("distance: " + str(distance))
+            print()
+
+    if reverse == 1:
+        f_primer = smanip.reverse(f_primer)
+    elif reverse == 2:
+        r_primer = smanip.reverse(r_primer)
+    elif reverse == 3:
+        f_primer = smanip.reverse(f_primer)
+        r_primer = smanip.reverse(r_primer)
+
+    if complement == 1:
+        f_primer = smanip.getcomplement(f_primer)
+    elif complement == 2:
+        r_primer = smanip.getcomplement(r_primer)
+    elif complement == 3:
+        f_primer = smanip.getcomplement(f_primer)
+        r_primer = smanip.getcomplement(r_primer)
     return (f_primer, r_primer)
