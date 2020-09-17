@@ -66,9 +66,12 @@ print()
 
 primes = primers.get_primers(cDNA, limiter=215, messages=False)
 single_strands = pcr.denaturation([cDNA])
-print("single_strands:")
-print(single_strands)
-pcr.annealing_elongation(single_strands, primes, 50, 205)
+results = pcr.PCR(cDNA, 50, 50, primes, 205)
+
+#print()
+#print(results)
+#print()
+#print(len(results))
 
 # forward:           ACCACTGGTTGTTACTCACA
 # reverse:           ACGGACGATCAACCCACTAC

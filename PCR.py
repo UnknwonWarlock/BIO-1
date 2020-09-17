@@ -32,12 +32,6 @@ def annealing_elongation(single_strands, primers, fall_of_rate=50, primer_distan
     # calculate the rate for cycle
     rate = primer_distance + random.randint(-fall_of_rate, fall_of_rate)
 
-    print()
-    print("forward: " + f_primer)
-    print("reverse: " + r_primer)
-    print("primer length: " + str(prim_length))
-    print("rate: " + str(rate))
-    print()
     
     for item in single_strands:
 
@@ -45,13 +39,11 @@ def annealing_elongation(single_strands, primers, fall_of_rate=50, primer_distan
         first = item
         second = ""
         
-        print("first:")
-        print(first)
-        print()
+        if first == "":
+            continue
 
         # if this is true then we are dealing with a reverse primer for the second
-        if smanip.reverse(first).count(f_primer) == 1:
-
+        if smanip.reverse(first).count(smanip.getcomplement(r_primer)) == 1:
             # easier to work with coding strands in 5->3
             second = smanip.reverse(first)
 
@@ -63,11 +55,10 @@ def annealing_elongation(single_strands, primers, fall_of_rate=50, primer_distan
 
             # use end to get the strand we need the complement of and get the complement
             second = second[end - rate:end + prim_length]
+
             second = smanip.getcomplement(second)
-            print("second: " + second)
-            print()
-        elif first.count(r_primer) == 1:
-            
+
+        elif first.count(smanip.getcomplement(f_primer)) == 1:
             # no need to reverse since easier to work in 3->5
             second = first
 
@@ -81,12 +72,7 @@ def annealing_elongation(single_strands, primers, fall_of_rate=50, primer_distan
             # get the complement and reverse the strand so we have 3->5 uniformly in every strand
             second = smanip.getcomplement(second)
             second = smanip.reverse(second)
-
-            print("second: " + second)
-            print()
-        else:
-            # um....well...this never ha..happens I swear. but to prevent degredation just stop looping through and adding to the list
-            break
+            
         DNA.append((first,second))
 
     return DNA
@@ -97,7 +83,7 @@ def PCR(DNA, fall_of_rate, num_cycles,primers, primer_distance=200):
     PCRproducts = [DNA]
     while cycles < num_cycles:
         single_strands = denaturation(PCRproducts)
-        PCRproducts = annealing_elongation(single_strands, primers, fall_of_rate)
+        PCRproducts = annealing_elongation(single_strands, primers, fall_of_rate, primer_distance)
         cycles += 1
 
     return PCRproducts
