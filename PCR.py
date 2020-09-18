@@ -256,5 +256,7 @@ def get_stats(results, max=1000000, with_originals=False):
     print("Minimum Strand Length: " + str(min_length))
     print("Average Strand Length: " + str(avg_length))
     print("Average Strand GC Count: " + str(avg_gc))
+    plt.xlabel("Sizes")
+    plt.ylabel("Counts")
     plt.bar(bar_chart.keys(), bar_chart.values())
     plt.show()
