@@ -2,6 +2,9 @@
 import primers as prim
 import random
 import strandmanipulation as smanip
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
 
 # param: a list of 2 string tuples to represent double stranded DNA
 # return: a list of single stranded DNA
@@ -14,7 +17,7 @@ def denaturation(dna_list):
         single_strands.append(item[1])
     return single_strands
 
-# param: 
+# param:
 #   a list of single strands, the forward and reverse primers, the fall or rate (usually between -50 to 50), and the primers distance
 #
 # return: a list of two string tuples to represent double stranded DNA
@@ -32,13 +35,13 @@ def annealing_elongation(single_strands, primers, fall_of_rate=50, primer_distan
     # calculate the rate for cycle
     rate = primer_distance + random.randint(-fall_of_rate, fall_of_rate)
 
-    
+
     for item in single_strands:
 
         # first strand of the tuple DNA for the list is the initial single strand
         first = item
         second = ""
-        
+
         if first == "":
             continue
 
@@ -72,12 +75,18 @@ def annealing_elongation(single_strands, primers, fall_of_rate=50, primer_distan
             # get the complement and reverse the strand so we have 3->5 uniformly in every strand
             second = smanip.getcomplement(second)
             second = smanip.reverse(second)
-            
+
         DNA.append((first,second))
 
     return DNA
-    
 
+# param: 
+#   DNA a list of double strand tuples, the e aspect of the fall off rate, the number of cycles desired, 
+#   a tuple containing the (forward, reverse) primers, and the distance between the primer
+#
+# return: the products of the PCR, list of double strand tuples
+# sum: Will simulate PCR on the provided DNA with the given cycles
+# notes: primers should be (forward 5->3, reverse 3->5)
 def PCR(DNA, fall_of_rate, num_cycles,primers, primer_distance=200):
     cycles = 0
     PCRproducts = [DNA]
@@ -87,3 +96,165 @@ def PCR(DNA, fall_of_rate, num_cycles,primers, primer_distance=200):
         cycles += 1
 
     return PCRproducts
+
+
+# param: the results of the PCR simulation, a max value to use for the minimum check, and a with_originals bool flag
+# returns: none
+# sum: prints some statistics about the data given
+# notes: the with_originals flag when false will search for the original two strands and not use them for the calculations
+def get_stats(results, max=1000000, with_originals=False):
+    avg_gc = 0
+    avg_length = 0
+    min_length = max
+    max_length = 0
+    DNA_fragments = 0
+    single_strands = 0
+    double_strands = 0
+    bar_chart = {}
+
+    # calculation with original two strands
+    if with_originals:
+        for items in results:
+
+            # Check if a second strand exist or not
+            if items[1] == "":
+
+                # fill dictionary with strand lenghts and counts for length distribution
+                if len(items[0]) in bar_chart:
+                    bar_chart[len(items[0])] +=  1
+                else:
+                    bar_chart[len(items[0])] = 1
+
+                # add 1 to single strand count
+                single_strands += 1
+
+                # update the totals for gc and length
+                avg_gc += prim.get_gc_count(items[0])
+                avg_length += len(items[0])
+
+                # check if new min and max
+                if len(items[0]) < min_length:
+                    min_length = len(items[0])
+
+                if len(items[0]) > max_length:
+                    max_length = len(items[0])
+
+            else:
+
+                # fill dictionary with strand lenghts and counts for length distribution
+                if len(items[0]) in bar_chart:
+                    bar_chart[len(items[0])] +=  1
+                else:
+                    bar_chart[len(items[0])] = 1
+
+                if len(items[1]) in bar_chart:
+                    bar_chart[len(items[1])] +=  1
+                else:
+                    bar_chart[len(items[1])] = 1
+
+                # double strand otherwise
+                double_strands += 1
+
+                # update total length and gc
+                avg_gc += (prim.get_gc_count(items[0]) + prim.get_gc_count(items[1]))
+                avg_length += (len(items[0]) + len(items[1]))
+
+                # check both strands for new max and min
+                if len(items[0]) < min_length:
+                    min_length = len(items[0])
+                if len(items[1]) < min_length:
+                    min_length = len(items[1])
+
+                if len(items[0]) > max_length:
+                    max_length = len(items[0])
+                if len(items[1]) > max_length:
+                    max_length = len(items[1])
+    else:
+        # get original size of first strands. One should be the first element of the first tuple
+        original_size = len(results[0][0])
+        for items in results:
+
+            # Check if a second strand exist or not
+            if items[1] == "":
+                # single strand if it doesn't
+                single_strands += 1
+
+                # check if the single strand is not an original
+                if len(items[0]) != original_size:
+
+                    # fill dictionary with strand lenghts and counts for length distribution
+                    if len(items[0]) in bar_chart:
+                        bar_chart[len(items[0])] +=  1
+                    else:
+                        bar_chart[len(items[0])] = 1
+
+                    # if it is not an original we can check and update values appropriately
+                    avg_gc += prim.get_gc_count(items[0])
+                    avg_length += len(items[0])
+
+                    if len(items[0]) < min_length:
+                        min_length = len(items[0])
+
+                    if len(items[0]) > max_length:
+                        max_length = len(items[0])
+
+            else:
+                # double strand otherwise
+                double_strands += 1
+
+                # check if the first strand is not an original
+                if len(items[0]) != original_size:
+
+                    # fill dictionary with strand lenghts and counts for length distribution
+                    if len(items[0]) in bar_chart:
+                        bar_chart[len(items[0])] +=  1
+                    else:
+                        bar_chart[len(items[0])] = 1
+
+                    if len(items[1]) in bar_chart:
+                        bar_chart[len(items[1])] +=  1
+                    else:
+                        bar_chart[len(items[1])] = 1
+
+                    # check and update values appropriately if it isn't
+                    avg_gc += prim.get_gc_count(items[0])
+                    avg_length += len(items[0])
+
+                    if len(items[0]) < min_length:
+                        min_length = len(items[0])
+
+                    if len(items[0]) > max_length:
+                        max_length = len(items[0])
+
+                # check if second strand is not an original
+                if len(items[1]) != original_size:
+
+                    # if it is not check and update values appropriately
+                    avg_gc += prim.get_gc_count(items[1])
+                    avg_length += len(items[1])
+
+                    if len(items[1]) < min_length:
+                        min_length = len(items[1])
+                    if len(items[1]) > max_length:
+                        max_length = len(items[1])
+
+    DNA_fragments = single_strands + (2 * double_strands)
+    avg_gc = avg_gc / DNA_fragments
+    avg_length = avg_length / DNA_fragments
+
+    print("=====================Statistics=====================")
+
+    if with_originals:
+        print("Statistics Calculated with the Original Two Strands!")
+    else:
+        print("Statistics Calculated WITHOUT the Original Two Strands!")
+
+    print("DNA Fragments: " + str(DNA_fragments))
+    print("Single Strands: " + str(single_strands))
+    print("Double Strands: " + str(double_strands))
+    print("Maximum Strand Length: " + str(max_length))
+    print("Minimum Strand Length: " + str(min_length))
+    print("Average Strand Length: " + str(avg_length))
+    print("Average Strand GC Count: " + str(avg_gc))
+    plt.bar(bar_chart.keys(), bar_chart.values())
+    plt.show()

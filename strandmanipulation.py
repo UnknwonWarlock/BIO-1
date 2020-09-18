@@ -2,12 +2,13 @@
 import os
 import re
 
-# Param: a string for the desired strand
-# Gets the complement of the given strand.
-# Requires strand to be validated first
-# Function does no reverse for the direction
-# EX: if you give a 5->3 strand you will get the 3->5 complement and vice versa
-# Return: the complement to the provided strand 
+# param: a string for the desired strand
+# return: the complement to the provided strand 
+# sum: Gets the complement of the given strand.
+# notes: 
+#   Requires strand to be validated first
+#   Function does no reverse for the direction
+#   EX: if you give a 5->3 strand you will get the 3->5 complement and vice versa
 def getcomplement(strand):
 
 
@@ -32,19 +33,21 @@ def getcomplement(strand):
 
     return cStrand
 
-# Param: a string for the desired strand
-# Reverses the direction of a given strand
-# EX: If given 3->5 will return 5->3 and vice versa
-# Return: Reverse string for the strand
+# param: a string for the desired strand
+# return: Reverse string for the strand
+# sum: Reverses the direction of a given strand
+# notes:
+#   EX: If given 3->5 will return 5->3 and vice versa
 def reverse(strand):
     return strand[::-1]
 
-# Param: A string for the desired strand
-# validates a provided strand to make sure it follows the following format:
-# 1. Only contain A,T,C,G (meaning not empty too)
-# 2. Is all uppercase (done within the function)
-# 3. Contains no newlines (done within the function)
-# Return: either the validated strand or stops the programs execution
+# param: A string for the desired strand
+# return: either the validated strand or stops the programs execution
+# sum: 
+#   validates a provided strand to make sure it follows the following format:
+#       1. Only contain A,T,C,G (meaning not empty too)
+#       2. Is all uppercase (done within the function)
+#       3. Contains no newlines (done within the function)
 def validate(strand):  
     strand = strand.replace("\n", "")
     strand = strand.upper()

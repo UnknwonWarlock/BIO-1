@@ -65,16 +65,10 @@ print(c_nsp6)
 print()
 
 primes = primers.get_primers(cDNA, limiter=215, messages=False)
-single_strands = pcr.denaturation([cDNA])
+
+print("Found Primers: ")
+print(primes)
+print()
+
 results = pcr.PCR(cDNA, 50, 50, primes, 205)
-
-#print()
-#print(results)
-#print()
-#print(len(results))
-
-# forward:           ACCACTGGTTGTTACTCACA
-# reverse:           ACGGACGATCAACCCACTAC
-# primer_f_start:    31
-# primer_r_start:    256
-# distance:          205
+pcr.get_stats(results)
