@@ -27,7 +27,10 @@ def annealing_elongation(single_strands, primers, fall_of_rate=50, primer_distan
 
     # get individual primers from primers
     f_primer = primers[0]
+    c_f_primer = smanip.getcomplement(f_primer)
+
     r_primer = primers[1]
+    c_r_primer = smanip.getcomplement(r_primer)
 
     # use any primer to get the length of a primer
     prim_length = len(f_primer)
@@ -46,7 +49,7 @@ def annealing_elongation(single_strands, primers, fall_of_rate=50, primer_distan
             continue
 
         # if this is true then we are dealing with a reverse primer for the second
-        if smanip.reverse(first).count(smanip.getcomplement(r_primer)) == 1:
+        if smanip.reverse(first).find(c_r_primer) != -1:
             # easier to work with coding strands in 5->3
             second = smanip.reverse(first)
 
@@ -61,7 +64,7 @@ def annealing_elongation(single_strands, primers, fall_of_rate=50, primer_distan
 
             second = smanip.getcomplement(second)
 
-        elif first.count(smanip.getcomplement(f_primer)) == 1:
+        elif first.find(c_f_primer) != -1:
             # no need to reverse since easier to work in 3->5
             second = first
 
@@ -87,12 +90,14 @@ def annealing_elongation(single_strands, primers, fall_of_rate=50, primer_distan
 # return: the products of the PCR, list of double strand tuples
 # sum: Will simulate PCR on the provided DNA with the given cycles
 # notes: primers should be (forward 5->3, reverse 3->5)
-def PCR(DNA, fall_of_rate, num_cycles,primers, primer_distance=200):
+def PCR(DNA, fall_of_rate, num_cycles,primers, primer_distance=200, cycle_messages=True):
     cycles = 0
     PCRproducts = [DNA]
     while cycles < num_cycles:
         single_strands = denaturation(PCRproducts)
         PCRproducts = annealing_elongation(single_strands, primers, fall_of_rate, primer_distance)
+        if cycle_messages:
+            print("Cycle " + str(cycles+1) + ": Completed")
         cycles += 1
 
     return PCRproducts
