@@ -31,6 +31,7 @@ def annealing_elongation(single_strands, primers, fall_of_rate=50, primer_distan
 
     r_primer = primers[1]
     c_r_primer = smanip.getcomplement(r_primer)
+    c_r_primer = smanip.reverse(c_r_primer)
 
     # use any primer to get the length of a primer
     prim_length = len(f_primer)
@@ -49,27 +50,28 @@ def annealing_elongation(single_strands, primers, fall_of_rate=50, primer_distan
             continue
 
         # if this is true then we are dealing with a reverse primer for the second
-        if smanip.reverse(first).find(c_r_primer) != -1:
+        if first.find(c_r_primer) != -1:
             # easier to work with coding strands in 5->3
-            second = smanip.reverse(first)
+            second = first
 
             # we need the complement to the r_primer to find the end index to get the strand we want the complement of
-            check = smanip.getcomplement(r_primer)
+            check = c_r_primer
 
             # get the end index
             end = second.index(check)
 
             # use end to get the strand we need the complement of and get the complement
-            second = second[end - rate:end + prim_length]
+            second = second[end:end + prim_length + rate]
 
             second = smanip.getcomplement(second)
+            second = smanip.reverse(second)
 
         elif first.find(c_f_primer) != -1:
             # no need to reverse since easier to work in 3->5
             second = first
 
             # need the complement of the primer to find start index on the strand
-            check = smanip.getcomplement(f_primer)
+            check = c_f_primer
 
             # use the complement to get the start index and find the part of the strand we want
             start = second.index(check)
