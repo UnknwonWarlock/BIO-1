@@ -36,11 +36,11 @@ def annealing_elongation(single_strands, primers, fall_of_rate=50, primer_distan
     # use any primer to get the length of a primer
     prim_length = len(f_primer)
 
-    # calculate the rate for cycle
-    rate = primer_distance + random.randint(-fall_of_rate, fall_of_rate)
-
 
     for item in single_strands:
+
+        # calculate the rate strand cycle
+        rate = primer_distance + random.randint(-fall_of_rate, fall_of_rate)
 
         # first strand of the tuple DNA for the list is the initial single strand
         first = item
