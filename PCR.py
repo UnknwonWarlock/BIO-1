@@ -40,7 +40,7 @@ def annealing_elongation(single_strands, primers, fall_of_rate=50, primer_distan
     for item in single_strands:
 
         # calculate the rate strand cycle
-        rate = primer_distance + random.randint(-fall_of_rate, fall_of_rate)
+        rate = random.randint((primer_distance + (2 * prim_length)) - fall_of_rate, (primer_distance + (2 * prim_length)) + fall_of_rate)
 
         # first strand of the tuple DNA for the list is the initial single strand
         first = item
@@ -75,6 +75,7 @@ def annealing_elongation(single_strands, primers, fall_of_rate=50, primer_distan
 
             # use the complement to get the start index and find the part of the strand we want
             start = second.index(check)
+
             second = second[start: start + prim_length + rate]
 
             # get the complement and reverse the strand so we have 3->5 uniformly in every strand
@@ -265,5 +266,6 @@ def get_stats(results, max=1000000, with_originals=False):
     print("Average Strand GC Count: " + str(avg_gc))
     plt.xlabel("Sizes")
     plt.ylabel("Counts")
+    plt.title("Size Distributions")
     plt.bar(bar_chart.keys(), bar_chart.values())
     plt.show()
