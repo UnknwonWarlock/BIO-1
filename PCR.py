@@ -106,11 +106,13 @@ def PCR(DNA, fall_of_rate, num_cycles,primers, primer_distance=200, cycle_messag
     return PCRproducts
 
 
-# param: the results of the PCR simulation, a max value to use for the minimum check, and a with_originals bool flag
+# param: the results of the PCR simulation, a max value to use for the minimum check, a with_originals bool flag, a log bool flag
 # returns: none
 # sum: prints some statistics about the data given
-# notes: the with_originals flag when false will search for the original two strands and not use them for the calculations
-def get_stats(results, max=1000000, with_originals=False):
+# notes: 
+#   The with_originals flag when false will search for the original two strands and not use them for the calculations
+#   The log flag will set the graph to a log scale for the y axis
+def get_stats(results, max=1000000, with_originals=False, log=False):
     avg_gc = 0
     avg_length = 0
     min_length = max
@@ -266,6 +268,10 @@ def get_stats(results, max=1000000, with_originals=False):
     print("Average Strand GC Count: " + str(avg_gc))
     plt.xlabel("Sizes")
     plt.ylabel("Counts")
+
+    if log:
+        plt.yscale("log")
+        
     plt.title("Size Distributions")
     plt.bar(bar_chart.keys(), bar_chart.values())
     plt.show()

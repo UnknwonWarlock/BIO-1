@@ -70,5 +70,5 @@ print("Found Primers: ")
 print(primes)
 print()
 
-results = pcr.PCR(cDNA, 50, 30, primes, 205)
-pcr.get_stats(results)
+results = pcr.PCR(cDNA, 50, 20, primes, 205)
+pcr.get_stats(results, log=True)
