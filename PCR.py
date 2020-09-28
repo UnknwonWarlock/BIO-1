@@ -251,7 +251,6 @@ def get_stats(results, max=1000000, with_originals=False, log=False):
     DNA_fragments = single_strands + (2 * double_strands)
     avg_gc = avg_gc / DNA_fragments
     avg_length = avg_length / DNA_fragments
-    strand_produced_percent = DNA_fragments / ((2 * double_strands)+(2 * single_strands))
 
     print("=====================Statistics=====================")
 
@@ -261,7 +260,6 @@ def get_stats(results, max=1000000, with_originals=False, log=False):
         print("Statistics Calculated WITHOUT the Original Two Strands!")
 
     print("DNA Fragments: " + str(DNA_fragments))
-    print("Strand Loss: " + str((1 - strand_produced_percent) * 100))
     print("Single Strands: " + str(single_strands))
     print("Double Strands: " + str(double_strands))
     print("Maximum Strand Length: " + str(max_length))
